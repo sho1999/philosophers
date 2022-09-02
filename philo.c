@@ -6,7 +6,7 @@
 /*   By: smuramat <smuramat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/27 17:06:42 by smuramat          #+#    #+#             */
-/*   Updated: 2022/09/01 22:18:42 by smuramat         ###   ########.fr       */
+/*   Updated: 2022/09/02 11:49:09 by smuramat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,3 +100,5 @@ int main(int argc, char **argv)
 	make_thread(p);
 	free(p);
 }
+
+//first
