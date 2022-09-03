@@ -6,7 +6,7 @@
 /*   By: smuramat <smuramat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/27 21:17:10 by smuramat          #+#    #+#             */
-/*   Updated: 2022/09/01 22:13:03 by smuramat         ###   ########.fr       */
+/*   Updated: 2022/09/02 12:17:25 by smuramat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,4 +33,10 @@ size_t cnv_ms(size_t ms)
 	micro = ms * 1000;
 	micro += 600;
 	return (micro);
+}
+
+void free_and_exit(t_philo *p)
+{
+	free(p);
+	exit(0);
 }
