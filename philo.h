@@ -6,7 +6,7 @@
 /*   By: smuramat <smuramat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/27 18:59:22 by smuramat          #+#    #+#             */
-/*   Updated: 2022/09/04 15:39:51 by smuramat         ###   ########.fr       */
+/*   Updated: 2022/09/04 18:12:40 by smuramat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,6 @@
 typedef struct s_philo_data
 {
 	size_t			num_philo;
-	size_t			num_philo2;
 	size_t			fork;
 	size_t			time_die;
 	size_t			time_eat;
@@ -41,13 +40,13 @@ typedef struct s_philo_data
 	size_t			total_num_eat;
 	pthread_mutex_t	mutex[200];
 	pthread_mutex_t	writing;
-	long long		last_eat_time;
+	long long		*last_eat_time;
 	long long		first_time;
 }					t_philo;
 
 int			ps_error(void);
 void		take_fork(size_t num_philo, t_philo *philo);
-long long	eating(size_t num_philo, t_philo *philo);
+void	eating(size_t num_p, t_philo *p);
 void		sleeping(size_t num_philo, t_philo *philo);
 void		thinking(size_t num_philo, t_philo *philo);
 int	check_die(size_t num_p, t_philo *p, long long last_t);

@@ -6,7 +6,7 @@
 /*   By: smuramat <smuramat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/27 17:06:42 by smuramat          #+#    #+#             */
-/*   Updated: 2022/09/04 15:47:04 by smuramat         ###   ########.fr       */
+/*   Updated: 2022/09/04 18:17:02 by smuramat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,6 @@ void	*thread_func(void *p)
 {
 	t_philo		*philo;
 	size_t		num_philo;
-	long long	last_eat_time;
 	long long	first_time;
 
 	philo = (t_philo *)p;
@@ -31,32 +30,54 @@ void	*thread_func(void *p)
 		one_philo(philo, num_philo);
 	if (num_philo % 2 == 0)
 		usleep(200);
-	last_eat_time = timestamp_ms();
-	while (check_die(num_philo, philo, last_eat_time))
+	while (1)
 	{
 		take_fork(num_philo, philo);
-		last_eat_time = eating(num_philo, philo);
+		eating(num_philo, philo);
 		sleeping(num_philo, philo);
 		thinking(num_philo, philo);
 	}
 	return (NULL);
 }
 
+void *ft_ins(void *p)
+{
+	t_philo *philo;
+	size_t	i;
+
+	philo = (t_philo *)p;
+	while (1)
+	{
+		i = 0;
+		while (i < philo->fork)
+		{
+			/* code */
+		}
+		
+		usleep(cnv_ms(5));
+	}
+	
+}
+
 void	make_thread(t_philo *philo)
 {
 	pthread_t		th;
+	pthread_t		inspection;
 	struct timeval	tv;
 	size_t			num_philo;
 
 	num_philo = philo->num_philo;
-	philo->num_philo = 1;
+	philo->num_philo = 0;
 	philo->first_time = timestamp_ms();
 	while (num_philo-- > 0)
 	{
 		if (pthread_create(&th, NULL, thread_func, (void *)philo) != 0)
 			free_and_exit(philo);
 	}
+	if (pthread_create(&inspection, NULL, ft_ins, (void *)philo) != 0)
+		free_and_exit(philo);
 	pthread_join(th, NULL);
+	pthread_join(inspection, NULL);
 }
 
 void	finalize(t_philo *p)
