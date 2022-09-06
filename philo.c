@@ -6,29 +6,26 @@
 /*   By: smuramat <smuramat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/27 17:06:42 by smuramat          #+#    #+#             */
-/*   Updated: 2022/09/04 18:17:02 by smuramat         ###   ########.fr       */
+/*   Updated: 2022/09/06 21:49:30 by smuramat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-static void	one_philo(t_philo *p, size_t num_p)
-{
-	printf("%lld %zu %s", timestamp_ms() - p->first_time, num_p, P_DEAD);
-	free_and_exit(p);
+__attribute__((destructor))
+static void destructor() {
+    system("leaks -q a.out");
 }
 
 void	*thread_func(void *p)
 {
 	t_philo		*philo;
 	size_t		num_philo;
-	long long	first_time;
 
 	philo = (t_philo *)p;
 	num_philo = philo->num_philo++;
-	if (philo->fork == 1)
-		one_philo(philo, num_philo);
-	if (num_philo % 2 == 0)
+	philo->last_eat_time[num_philo] = timestamp_ms();
+	if (num_philo % 2 == 1)
 		usleep(200);
 	while (1)
 	{
@@ -40,40 +37,18 @@ void	*thread_func(void *p)
 	return (NULL);
 }
 
-void *ft_ins(void *p)
-{
-	t_philo *philo;
-	size_t	i;
-
-	philo = (t_philo *)p;
-	while (1)
-	{
-		i = 0;
-		while (i < philo->fork)
-		{
-			/* code */
-		}
-		
-		usleep(cnv_ms(5));
-	}
-	
-}
-
 void	make_thread(t_philo *philo)
 {
 	pthread_t		th;
 	pthread_t		inspection;
-	struct timeval	tv;
 	size_t			num_philo;
 
 	num_philo = philo->num_philo;
 	philo->num_philo = 0;
-	philo->first_time = timestamp_ms();
+	// philo->first_time = timestamp_ms();
 	while (num_philo-- > 0)
-	{
 		if (pthread_create(&th, NULL, thread_func, (void *)philo) != 0)
 			free_and_exit(philo);
-	}
 	if (pthread_create(&inspection, NULL, ft_ins, (void *)philo) != 0)
 		free_and_exit(philo);
 	pthread_join(th, NULL);
@@ -88,7 +63,10 @@ void	finalize(t_philo *p)
 	while (i < p->num_philo)
 		pthread_mutex_destroy(&(p->mutex[i++]));
 	pthread_mutex_destroy(&(p->writing));
+	i = 0;
+	free(p->last_eat_time);
 	free(p);
+	exit(0);
 }
 
 

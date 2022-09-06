@@ -6,7 +6,7 @@
 /*   By: smuramat <smuramat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/27 18:59:22 by smuramat          #+#    #+#             */
-/*   Updated: 2022/09/04 18:12:40 by smuramat         ###   ########.fr       */
+/*   Updated: 2022/09/06 21:51:02 by smuramat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,8 +27,6 @@
 # define P_SLEEP "is sleeping\n"
 # define P_DEAD "is died\n"
 
-
-
 typedef struct s_philo_data
 {
 	size_t			num_philo;
@@ -38,10 +36,11 @@ typedef struct s_philo_data
 	size_t			time_sleep;
 	size_t			num_must_eat;
 	size_t			total_num_eat;
-	pthread_mutex_t	mutex[200];
+	long long			*ideal_time;
+	pthread_mutex_t	*mutex;
 	pthread_mutex_t	writing;
 	long long		*last_eat_time;
-	long long		first_time;
+	long long		*first_time;
 }					t_philo;
 
 int			ps_error(void);
@@ -49,7 +48,7 @@ void		take_fork(size_t num_philo, t_philo *philo);
 void	eating(size_t num_p, t_philo *p);
 void		sleeping(size_t num_philo, t_philo *philo);
 void		thinking(size_t num_philo, t_philo *philo);
-int	check_die(size_t num_p, t_philo *p, long long last_t);
+void	check_die(size_t num_p, t_philo *p);
 void		init_philo(int argc, char **argv, t_philo *p);
 long long	timestamp_ms(void);
 size_t		cnv_ms(size_t ms);
@@ -57,5 +56,8 @@ void		free_and_exit(t_philo *p);
 void		ft_putstr_fd(char *s, int fd);
 void	ft_putchar_fd(char c, int fd);
 void	ft_putnbr_fd(int nb, int fd);
+void	one_philo(t_philo *p, size_t num_p);
+void *ft_ins(void *p);
+void	finalize(t_philo *p);
 
 #endif
