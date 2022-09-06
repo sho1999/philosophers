@@ -6,7 +6,7 @@
 /*   By: smuramat <smuramat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/27 18:59:22 by smuramat          #+#    #+#             */
-/*   Updated: 2022/09/01 21:54:06 by smuramat         ###   ########.fr       */
+/*   Updated: 2022/09/06 22:16:20 by smuramat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ typedef struct s_philo_data
 	size_t			num_must_eat;
 	pthread_mutex_t	mutex;
 	long long		last_eat_time;
-	long long		first_time;
+	long long		*first_time;
 }					t_philo;
 
 int	ps_error(void);
