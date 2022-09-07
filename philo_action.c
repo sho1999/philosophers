@@ -6,45 +6,67 @@
 /*   By: smuramat <smuramat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/29 18:39:04 by smuramat          #+#    #+#             */
-/*   Updated: 2022/09/01 22:16:34 by smuramat         ###   ########.fr       */
+/*   Updated: 2022/09/07 21:16:24 by smuramat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-void take_fork(size_t num_philo, t_philo *philo)
+void	take_fork(t_p_philo *p)
 {
-	pthread_mutex_lock(&philo->mutex);
-	printf("%lld %zu has taken a fork\n", timestamp_ms() - philo->first_time, num_philo);fflush(stdout);
-	printf("%lld %zu has taken a fork\n", timestamp_ms() - philo->first_time, num_philo);fflush(stdout);
+	printf("%zu\n", p->id);fflush(stdout);
+	
+	pthread_mutex_lock(&p->pub->mutex[p->id]);
+	printf("%lld %zu %s", timestamp_ms(), p->id, P_FORK);
+	if (p->id == p->pub->num_philo - 1)
+		pthread_mutex_lock(&p->pub->mutex[0]);
+	else
+		pthread_mutex_lock(&p->pub->mutex[p->id + 1]);
+	printf("%lld %zu %s", timestamp_ms(), p->id, P_FORK);
 }
 
-int eating(size_t num_philo, t_philo *philo)
+void	eating(t_p_philo *p)
 {
-	printf("%lld %zu is eating\n", timestamp_ms() - philo->first_time, num_philo);fflush(stdout);
-	philo->last_eat_time = timestamp_ms();
-	usleep(300);
-  usleep(cnv_ms(philo->time_eat - 6));
-	pthread_mutex_unlock(&philo->mutex);
-	return (1);
+	p->first_time = timestamp_ms();
+	printf("%lld %zu %s", timestamp_ms(), p->id, P_EAT);
+	p->last_eat_time = timestamp_ms();
+	pthread_mutex_lock(&p->pub->writing);
+	p->pub->total_num_eat++;
+	if (p->pub->total_num_eat == p->pub->num_must_eat * p->pub->num_philo)
+		finalize(p->pub);
+	pthread_mutex_unlock(&p->pub->writing);
+  usleep(cnv_ms(p->pub->time_eat));
+	pthread_mutex_unlock(&p->pub->mutex[p->id]);
+	if (p->id == p->pub->num_philo - 1)
+		pthread_mutex_unlock(&p->pub->mutex[0]);
+	else
+		pthread_mutex_unlock(&p->pub->mutex[p->id + 1]);
 }
 
-void sleeping(size_t num_philo, t_philo *philo)
+void	sleeping(t_p_philo *p)
 {
-	printf("%lld %zu is sleeping\n", timestamp_ms() - philo->first_time, num_philo);fflush(stdout);
-  usleep(cnv_ms(philo->time_sleep - 7));
+	p->ideal_time = timestamp_ms() - (p->first_time + p->pub->time_eat);
+	pthread_mutex_lock(&p->pub->writing);
+	printf("%lld %zu %s", timestamp_ms() - p->ideal_time, p->id, P_SLEEP);
+	pthread_mutex_unlock(&p->pub->writing);
+	usleep(cnv_ms(p->pub->time_sleep));
 }
 
-void thinking(size_t num_philo, t_philo *philo)
+void	thinking(t_p_philo *p)
 {
-	printf("%lld %zu is thinking\n", timestamp_ms() - philo->first_time, num_philo);fflush(stdout);
+	p->ideal_time = timestamp_ms() - (p->first_time + p->pub->time_eat + p->pub->time_sleep);
+	pthread_mutex_lock(&p->pub->writing);
+	printf("%lld %zu %s", timestamp_ms() - p->ideal_time, p->id, P_THINK);
+	pthread_mutex_unlock(&p->pub->writing);
 }
 
-void check_die(size_t num_philo, t_philo *philo)
+void	check_die(t_p_philo *p)
 {
-	if (timestamp_ms() - philo->last_eat_time >= philo->time_die)
+	pthread_mutex_lock(&p->pub->writing);
+	if (timestamp_ms() - p->last_eat_time > p->pub->time_die + p->ideal_time)
 	{
-		printf("%lld %zu died\n", timestamp_ms() - philo->first_time, num_philo);fflush(stdout);
-		exit(0);//philoのfree処理
+		printf("%lld %zu %s", timestamp_ms(), p->id, P_DEAD);
+		free_and_exit(p->pub);
 	}
+	pthread_mutex_unlock(&p->pub->writing);
 }
