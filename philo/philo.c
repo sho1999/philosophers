@@ -6,16 +6,11 @@
 /*   By: smuramat <smuramat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/27 17:06:42 by smuramat          #+#    #+#             */
-/*   Updated: 2022/09/06 21:49:30 by smuramat         ###   ########.fr       */
+/*   Updated: 2022/09/08 09:29:50 by smuramat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "philo.h"
-
-__attribute__((destructor))
-static void destructor() {
-    system("leaks -q a.out");
-}
+#include "../philo.h"
 
 void	*thread_func(void *p)
 {
@@ -45,41 +40,24 @@ void	make_thread(t_philo *philo)
 
 	num_philo = philo->num_philo;
 	philo->num_philo = 0;
-	// philo->first_time = timestamp_ms();
 	while (num_philo-- > 0)
 		if (pthread_create(&th, NULL, thread_func, (void *)philo) != 0)
-			free_and_exit(philo);
+			finalize(philo, END_ABNORMAL);
 	if (pthread_create(&inspection, NULL, ft_ins, (void *)philo) != 0)
-		free_and_exit(philo);
+		finalize(philo, END_ABNORMAL);
 	pthread_join(th, NULL);
 	pthread_join(inspection, NULL);
 }
-
-void	finalize(t_philo *p)
-{
-	size_t i;
-
-	i = 0;
-	while (i < p->num_philo)
-		pthread_mutex_destroy(&(p->mutex[i++]));
-	pthread_mutex_destroy(&(p->writing));
-	i = 0;
-	free(p->last_eat_time);
-	free(p);
-	exit(0);
-}
-
 
 int	main(int argc, char **argv)
 {
 	t_philo	*p;
 
 	if (!(5 <= argc && argc <= 6))
-		exit(1);
+		philo_error(USAGE);
 	p = (t_philo *)malloc(sizeof(t_philo));
 	if (!p)
-		exit(1);
+		philo_error(MALLOC_ERR);
 	init_philo(argc, argv, p);
 	make_thread(p);
-	finalize(p);
 }

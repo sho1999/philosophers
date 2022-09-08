@@ -1,24 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   philo_util.c                                       :+:      :+:    :+:   */
+/*   util.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: smuramat <smuramat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/27 21:17:10 by smuramat          #+#    #+#             */
-/*   Updated: 2022/09/06 21:32:55 by smuramat         ###   ########.fr       */
+/*   Updated: 2022/09/08 09:49:31 by smuramat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "philo.h"
+#include "../philo.h"
 
-int	ps_error(void)
+int	philo_error(char *s)
 {
-	ft_putstr_fd("Error\n", STDERR);
-	return (1);
+	size_t	i;
+
+	i = 0;
+	if (s)
+		while (s[i])
+			write(STDERR, &s[i++], 1);
+	exit(1);
 }
 
-long long	timestamp_ms(void)
+size_t	timestamp_ms(void)
 {
 	struct timeval	t;
 
@@ -40,15 +45,15 @@ void	free_and_exit(t_philo *p)
 	exit(1);
 }
 
-void *ft_ins(void *p)
+void	*ft_ins(void *p)
 {
-	t_philo *philo;
+	t_philo	*philo;
 	size_t	i;
 
 	philo = (t_philo *)p;
 	while (1)
 	{
-		usleep(cnv_ms(10));
+		usleep(cnv_ms(8));
 		i = 0;
 		while (i < philo->fork)
 			check_die(i++, philo);
